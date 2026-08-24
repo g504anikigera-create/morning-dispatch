@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>お問い合わせ — Morning Dispatch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{--paper:#F4F1EA;--card:#FBF9F4;--ink:#17282B;--ink-soft:#4A5C5F;--ink-faint:#8A9698;--teal:#0F6E6B;--teal-deep:#0A4E4C;--amber:#B26A00;--line:#E3DDD0;--maxw:720px;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px 60px;}
+  .back{display:inline-block;margin:24px 0 8px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--teal);text-decoration:none;}
+  .back:hover{text-decoration:underline;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin:16px 0 6px;}
+  h1{font-family:"Newsreader",serif;font-weight:600;font-size:30px;margin:0 0 22px;padding-bottom:20px;border-bottom:1.5px solid var(--ink);letter-spacing:-.01em;}
+  p{font-size:15px;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;margin-top:8px;box-shadow:0 1px 2px rgba(23,40,43,.05),0 8px 24px rgba(23,40,43,.06);}
+  .label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+  .mail{font-family:"Newsreader",serif;font-size:22px;color:var(--ink);word-break:break-all;}
+  .btn{display:inline-block;margin-top:18px;background:var(--teal);color:#fff;text-decoration:none;font-weight:500;font-size:15px;padding:11px 22px;border-radius:10px;}
+  .btn:hover{background:var(--teal-deep);}
+  footer{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-faint);}
+  footer .links{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;}
+  footer a{color:var(--teal);text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">Morning Dispatch</div>
+  <h1>お問い合わせ</h1>
+
+  <p>本サイトに関するご質問・ご連絡は、以下のメールアドレスまでお願いいたします。内容を確認のうえ、順次返信いたします。</p>
+
+  <div class="card">
+    <div class="label">Email</div>
+    <div class="mail">daidaifighter12@gmail.com</div>
+    <a class="btn" href="mailto:daidaifighter12@gmail.com?subject=Morning%20Dispatch%20お問い合わせ">メールを作成する</a>
+  </div>
+
+  <p style="margin-top:20px;font-size:13.5px;color:var(--ink-soft);">※ 返信には数日いただく場合があります。あらかじめご了承ください。</p>
+
+  <footer>
+    <div class="links">
+      <a href="about.html">運営者情報</a>
+      <a href="privacy.html">プライバシーポリシー</a>
+      <a href="contact.html">お問い合わせ</a>
+    </div>
+    <div>© <span id="y"></span> Morning Dispatch</div>
+  </footer>
+</div>
+<script>document.getElementById("y").textContent=new Date().getFullYear();</script>
+</body>
+</html>
