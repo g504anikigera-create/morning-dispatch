@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Morning Dispatch — 世界のニュースで学ぶ英語</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     CONFIG は <script> の先頭にあります（プロキシURL・モデル等）
+     デザイントークン
+     ============================================================ */
+  :root{
+    --paper:#F4F1EA;
+    --card:#FBF9F4;
+    --ink:#17282B;
+    --ink-soft:#4A5C5F;
+    --ink-faint:#8A9698;
+    --teal:#0F6E6B;
+    --teal-deep:#0A4E4C;
+    --amber:#B26A00;
+    --amber-soft:#E9B44C;
+    --line:#E3DDD0;
+    --line-strong:#CFC7B4;
+    --danger:#9B2C2C;
+    --shadow:0 1px 2px rgba(23,40,43,.05), 0 8px 24px rgba(23,40,43,.06);
+    --maxw:720px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px 120px;}
+
+  /* ---- masthead ---- */
+  .masthead{
+    padding:26px 0 18px;
+    border-bottom:1.5px solid var(--ink);
+    margin-bottom:26px;
+    display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  }
+  .masthead-l .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--teal);margin-bottom:6px;
+  }
+  .masthead-l h1{
+    font-family:"Newsreader",serif;font-weight:600;
+    font-size:26px;line-height:1.1;margin:0;letter-spacing:-.01em;
+  }
+  .masthead-l .date{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft);margin-top:8px;
+  }
+  .toolbar{display:flex;gap:8px;flex-shrink:0;}
+  .icon-btn{
+    appearance:none;border:1px solid var(--line-strong);background:var(--card);
+    width:40px;height:40px;border-radius:10px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+    transition:border-color .15s,color .15s,background .15s;
+  }
+  .icon-btn:hover{border-color:var(--teal);color:var(--teal);}
+  .icon-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .icon-btn svg{width:19px;height:19px;}
+
+  /* ---- panels (settings / history) ---- */
+  .panel{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px;margin-bottom:24px;box-shadow:var(--shadow);
+    display:none;
+  }
+  .panel.open{display:block;}
+  .panel h2{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--teal);margin:0 0 14px;font-weight:500;
+  }
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  .field-label{font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;font-weight:500;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{
+    appearance:none;cursor:pointer;font-family:inherit;font-size:13px;
+    padding:6px 13px;border-radius:999px;border:1px solid var(--line-strong);
+    background:transparent;color:var(--ink-soft);transition:all .15s;
+  }
+  .chip:hover{border-color:var(--teal);}
+  .chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .apply-row{display:flex;gap:10px;margin-top:18px;align-items:center;}
+  .btn{
+    appearance:none;cursor:pointer;font-family:inherit;font-weight:500;font-size:14px;
+    padding:10px 18px;border-radius:10px;border:1px solid var(--teal);
+    background:var(--teal);color:#fff;transition:background .15s;
+  }
+  .btn:hover{background:var(--teal-deep);}
+  .btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+  .btn.ghost{background:transparent;color:var(--teal);}
+  .btn.ghost:hover{background:rgba(15,110,107,.07);}
+  .hint{font-size:12px;color:var(--ink-faint);}
+
+  .hist-item{
+    display:flex;flex-direction:column;gap:2px;padding:11px 12px;border-radius:10px;
+    cursor:pointer;border:1px solid transparent;
+  }
+  .hist-item:hover{background:var(--paper);border-color:var(--line);}
+  .hist-item .h-date{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--teal);}
+  .hist-item .h-title{font-family:"Newsreader",serif;font-size:15px;color:var(--ink);}
+  .hist-empty{font-size:13px;color:var(--ink-faint);padding:4px 2px;}
+
+  /* ---- article ---- */
+  .kicker{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;gap:10px;align-items:center;
+  }
+  .kicker .badge{
+    background:var(--amber);color:#fff;padding:2px 8px;border-radius:5px;letter-spacing:.1em;font-size:10px;
+  }
+  .headline-en{
+    font-family:"Newsreader",serif;font-weight:600;font-size:33px;line-height:1.12;
+    letter-spacing:-.015em;margin:0 0 10px;
+  }
+  .headline-ja{font-size:15px;color:var(--ink-soft);margin:0 0 16px;font-weight:500;}
+  .source-row{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-faint);
+    padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--line);
+  }
+  .source-row a{color:var(--teal);text-decoration:none;border-bottom:1px solid var(--line-strong);}
+  .source-row a:hover{border-color:var(--teal);}
+
+  .section-label{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--teal);margin:32px 0 12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .section-label::after{content:"";height:1px;background:var(--line);flex:1;}
+  .prose{font-size:15.5px;color:var(--ink);}
+  .why{
+    background:rgba(15,110,107,.06);border-left:3px solid var(--teal);
+    padding:12px 16px;border-radius:0 8px 8px 0;font-size:14.5px;color:var(--ink-soft);
+  }
+
+  /* ---- expression cards (the signature) ---- */
+  .expr{
+    border:1px solid var(--line);background:var(--card);border-radius:14px;
+    padding:20px 20px 18px;margin-bottom:16px;box-shadow:var(--shadow);
+  }
+  .expr-type{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--teal);
+    border:1px solid var(--teal);border-radius:5px;padding:2px 7px;display:inline-block;margin-bottom:12px;
+  }
+  .expr-en{
+    font-family:"Newsreader",serif;font-weight:500;font-size:25px;line-height:1.2;
+    margin:0 0 4px;display:inline;
+    background-image:linear-gradient(transparent 62%, var(--amber-soft) 62%);
+    background-size:100% 100%;padding:0 1px;
+  }
+  .expr-reading{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-faint);margin:8px 0 12px;}
+  .expr-ja{font-size:15px;font-weight:500;margin:12px 0 8px;color:var(--ink);}
+  .expr-nuance{font-size:14px;color:var(--ink-soft);margin:0 0 14px;}
+  .expr-ex{
+    background:var(--paper);border-radius:10px;padding:12px 14px;
+  }
+  .expr-ex .ex-en{font-family:"Newsreader",serif;font-size:16px;font-style:italic;color:var(--ink);margin:0 0 4px;}
+  .expr-ex .ex-ja{font-size:13px;color:var(--ink-soft);margin:0;}
+
+  /* ---- takeaway / practice ---- */
+  .takeaway{
+    background:var(--ink);color:#EDEAE0;border-radius:14px;padding:22px 22px;margin-top:8px;
+  }
+  .takeaway .section-label{color:var(--amber-soft);margin-top:0;}
+  .takeaway .section-label::after{background:rgba(255,255,255,.14);}
+  .takeaway .prose{color:#DCE3E2;font-size:15px;}
+  .practice{margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.13);}
+  .practice .p-en{font-family:"Newsreader",serif;font-size:18px;font-style:italic;color:#fff;margin:0 0 6px;}
+  .practice .p-ja{font-size:13px;color:#B9C4C3;margin:0;}
+
+  /* ---- loading ---- */
+  .loading{text-align:center;padding:70px 20px;}
+  .pulse{
+    width:44px;height:44px;margin:0 auto 22px;border-radius:50%;
+    border:2px solid var(--line-strong);border-top-color:var(--teal);
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading .stage{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--teal);letter-spacing:.05em;}
+  .loading .sub{font-size:12.5px;color:var(--ink-faint);margin-top:8px;}
+
+  /* ---- error / empty ---- */
+  .notice{
+    border:1px solid var(--line-strong);background:var(--card);border-radius:14px;
+    padding:24px;margin-top:8px;
+  }
+  .notice.err{border-color:#E0C0C0;background:#FBF3F1;}
+  .notice h3{font-family:"Newsreader",serif;font-size:20px;margin:0 0 10px;color:var(--ink);}
+  .notice.err h3{color:var(--danger);}
+  .notice p{font-size:14px;color:var(--ink-soft);margin:0 0 10px;}
+  .notice ul{font-size:13.5px;color:var(--ink-soft);margin:10px 0 0;padding-left:20px;}
+  .notice li{margin-bottom:5px;}
+  .notice details{margin-top:14px;font-size:12px;}
+  .notice summary{cursor:pointer;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;}
+  .notice pre{
+    white-space:pre-wrap;word-break:break-word;background:var(--paper);
+    padding:12px;border-radius:8px;margin-top:8px;font-size:11.5px;color:var(--ink-soft);max-height:220px;overflow:auto;
+  }
+  .notice .btn{margin-top:16px;}
+
+  @media (max-width:520px){
+    .headline-en{font-size:27px;}
+    .expr-en{font-size:22px;}
+    .masthead-l h1{font-size:22px;}
+    .wrap{padding:0 16px 100px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .pulse{animation-duration:2.4s;}
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="masthead-l">
+      <div class="eyebrow">Morning Dispatch</div>
+      <h1>世界のニュースで学ぶ英語</h1>
+      <div class="date" id="dateLabel">—</div>
+    </div>
+    <div class="toolbar">
+      <button class="icon-btn" id="btnHistory" title="履歴" aria-label="履歴">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg>
+      </button>
+      <button class="icon-btn" id="btnSettings" title="設定" aria-label="設定">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="icon-btn" id="btnRefresh" title="新しい記事" aria-label="新しい記事">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- settings -->
+  <section class="panel" id="settingsPanel">
+    <h2>学習の設定</h2>
+    <div class="field">
+      <div class="field-label">ジャンル</div>
+      <div class="chips" data-group="genre">
+        <button class="chip" data-val="ビジネス・経済">ビジネス・経済</button>
+        <button class="chip" data-val="テクノロジー">テクノロジー</button>
+        <button class="chip" data-val="政治・国際">政治・国際</button>
+        <button class="chip" data-val="時事一般">時事一般</button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">学びたい表現（複数可）</div>
+      <div class="chips" data-group="focus">
+        <button class="chip" data-val="イディオム・口語">イディオム・口語</button>
+        <button class="chip" data-val="ビジネス表現">ビジネス表現</button>
+        <button class="chip" data-val="上級語彙">上級語彙</button>
+        <button class="chip" data-val="句動詞">句動詞</button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">難易度</div>
+      <div class="chips" data-group="level" data-single="1">
+        <button class="chip" data-val="標準">標準</button>
+        <button class="chip" data-val="難しめ">難しめ</button>
+        <button class="chip" data-val="かなり難しめ">かなり難しめ</button>
+      </div>
+    </div>
+    <div class="apply-row">
+      <button class="btn" id="applySettings">この設定で生成</button>
+      <span class="hint">変更すると本日分を作り直します</span>
+    </div>
+  </section>
+
+  <!-- history -->
+  <section class="panel" id="historyPanel">
+    <h2>これまでのレッスン</h2>
+    <div id="historyList"></div>
+  </section>
+
+  <!-- main content -->
+  <main id="content" aria-live="polite">
+    <div class="loading">
+      <div class="pulse"></div>
+      <div class="stage" id="loadStage">起動中…</div>
+      <div class="sub">初回は世界のニュース検索から解説執筆まで少し時間がかかります</div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   ▼ ここだけ環境に合わせて調整してください
+   ============================================================ */
+const CONFIG = {
+  // 既存の Cloudflare Workers プロキシ（テーブル管理ツールで使っていたもの）
+  PROXY_URL: "https://ocr-proxy.g504-aniki-gera.workers.dev",
+  // モデル（あなたのAPIキーで使えるものに。例: claude-sonnet-5 / claude-opus-4-8）
+  MODEL: "claude-sonnet-5",
+  MAX_TOKENS: 4000,
+};
+/* ============================================================
+   ※ プロキシは受け取ったJSONボディ（model / max_tokens / messages /
+     tools[web_search] / system）を “そのまま” api.anthropic.com/v1/messages
+     に転送し、APIキーと anthropic-version ヘッダを付与、CORSを許可する必要が
+     あります。OCR専用に固定していた場合はボディ転送を汎用化してください。
+   ============================================================ */
+
+/* ---- 安全なストレージ（Claudeプレビューでは自動でメモリ退避） ---- */
+const _mem = {};
+const store = {
+  get(k){ try { return window.localStorage.getItem(k); } catch(e){ return (k in _mem) ? _mem[k] : null; } },
+  set(k,v){ try { window.localStorage.setItem(k,v); } catch(e){ _mem[k] = v; } },
+};
+
+/* ---- 日付ユーティリティ ---- */
+function todayStr(){
+  const d = new Date();
+  const p = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function prettyDate(s){
+  const [y,m,d] = s.split("-").map(Number);
+  const wd = ["日","月","火","水","木","金","土"][new Date(y,m-1,d).getDay()];
+  return `${y}.${String(m).padStart(2,"0")}.${String(d).padStart(2,"0")} (${wd})`;
+}
+
+/* ---- 設定 ---- */
+const DEFAULT_SETTINGS = {
+  genre: ["ビジネス・経済"],
+  focus: ["イディオム・口語","ビジネス表現","上級語彙"],
+  level: "難しめ",
+};
+function loadSettings(){
+  try { return { ...DEFAULT_SETTINGS, ...JSON.parse(store.get("mnd:settings")||"{}") }; }
+  catch(e){ return { ...DEFAULT_SETTINGS }; }
+}
+function saveSettings(s){ store.set("mnd:settings", JSON.stringify(s)); }
+let settings = loadSettings();
+
+function settingsHash(s){
+  return btoa(unescape(encodeURIComponent(
+    [...s.genre].sort().join(",")+"|"+[...s.focus].sort().join(",")+"|"+s.level
+  ))).slice(0,12);
+}
+
+/* ---- 履歴インデックス ---- */
+function loadIndex(){ try { return JSON.parse(store.get("mnd:index")||"[]"); } catch(e){ return []; } }
+function pushIndex(date, key, headline){
+  let idx = loadIndex().filter(x => x.key !== key);
+  idx.unshift({ date, key, headline });
+  idx = idx.slice(0, 40);
+  store.set("mnd:index", JSON.stringify(idx));
+}
+
+/* ---- DOM helpers ---- */
+const $ = sel => document.querySelector(sel);
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ---- プロンプト生成 ---- */
+function buildRequestBody(s){
+  const sys = [
+    "あなたは、日本人のビジネスパーソン（SAP/ITコンサルタント・英語上級学習者）専属の英語学習エディターです。",
+    "まず web_search ツールで、直近（できれば当日〜数日以内）の“本当に重要な”世界のニュース記事を1本だけ選びます。",
+    "信頼できる英語メディア（Reuters, BBC, The Economist, FT, Bloomberg, The Guardian, NYT 等）を優先。",
+    `ジャンルは「${s.genre.join("・")}」を優先。`,
+    `記事は ${s.level} の英語で、次の要素が豊富なものを選ぶ：${s.focus.join("、")}。`,
+    "選んだ記事をもとに、じっくり深掘りの学習教材を作成します。",
+    "重要語・表現は6〜8個。イディオム/句動詞/コロケーション/ビジネス用語/口語・スラング/上級単語をバランス良く。",
+    "各表現には、意味だけでなく“ニュアンス（フォーマル度・含意・使いどころ・類似表現との差）”を必ず添える。",
+    "解説文はすべて日本語。例文はあなた自身が創作した英文＋日本語訳（記事本文の文をそのまま例文に流用しない）。",
+    "",
+    "【著作権ルール（厳守）】",
+    "・記事本文をコピーしない。段落・複数文の引用や、それに近い言い換えの写しも禁止。",
+    "・『記事の要約』を作らない。原文を読まなくても内容が全部わかるレベルのまとめは禁止（翻案のおそれ）。",
+    "・代わりに、報じられている“事実”（誰が・何を・いつ・どこで・なぜ）を、あなた自身の言葉で簡潔に述べる。事実そのものに著作権はない。",
+    "・原文の言い回し・構成・比喩をなぞらない。事実の骨子だけを独立に記述する。",
+    "・学習対象の英語表現は、1項目あたり数語〜1文以内の“短い”ものに限る（この教材＝解説が主、引用が従の関係を保つ）。",
+    "・出所（媒体名・URL）を必ず記載し、詳しくは原文リンクへ誘導する。",
+    "・見出しは媒体の見出しを丸写しせず、自作の短いトピック表現にする。",
+    "",
+    "出力は、前置きやマークダウンの```を一切付けず、次のJSONオブジェクトのみを返す：",
+    `{
+  "date": "YYYY-MM-DD",
+  "headline_en": "この教材用にあなたが作る短い英語トピック見出し（媒体見出しの丸写しは禁止）",
+  "headline_ja": "その日本語版",
+  "source_name": "媒体名",
+  "source_url": "記事URL",
+  "facts_ja": "報じられている事実を自分の言葉で簡潔に（日本語・3〜4文／要約ではなく事実の骨子。原文の言い回し・構成をなぞらない）",
+  "why_important_ja": "なぜ重要か・背景（日本語・1〜2文／自分の言葉で）",
+  "expressions": [
+    {
+      "type": "IDIOM | PHRASAL VERB | COLLOCATION | BUSINESS TERM | SLANG | ADVANCED WORD",
+      "en": "対象の英語表現",
+      "reading_note": "発音や活用の注意（不要なら空文字）",
+      "ja": "意味",
+      "nuance_ja": "ニュアンス・使いどころ・類似表現との違い",
+      "example_en": "例文（英語）",
+      "example_ja": "例文の日本語訳"
+    }
+  ],
+  "takeaway_ja": "今日のひとこと（覚え方・使い方のコツ・1〜2文）",
+  "practice_en": "学んだ表現を使ったモデル英作文（1文）",
+  "practice_ja": "その日本語訳"
+}`
+  ].join("\n");
+
+  return {
+    model: CONFIG.MODEL,
+    max_tokens: CONFIG.MAX_TOKENS,
+    system: sys,
+    messages: [
+      { role: "user", content: `今日（${todayStr()}）の学習用に、上記条件で記事を1本選び、JSONで教材を作ってください。` }
+    ],
+    tools: [ { type: "web_search_20250305", name: "web_search", max_uses: 6 } ],
+  };
+}
+
+/* ---- APIレスポンスからJSON抽出 ---- */
+function extractJson(data){
+  if(data && data.error){ throw new Error(data.error.message || JSON.stringify(data.error)); }
+  const blocks = (data && data.content) || [];
+  const text = blocks.filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+  if(!text) throw new Error("モデルからテキスト応答が得られませんでした。");
+  const s = text.indexOf("{"), e = text.lastIndexOf("}");
+  if(s === -1 || e === -1) throw new Error("応答からJSONを取り出せませんでした。");
+  return { obj: JSON.parse(text.slice(s, e+1)), raw: text };
+}
+
+/* ---- 生成 ---- */
+let loadTimer = null;
+function startLoadingAnim(){
+  const stages = ["世界のニュースを検索中…","重要な記事を厳選中…","表現を抜き出し中…","解説を執筆中…"];
+  let i = 0;
+  const el = $("#loadStage");
+  if(el) el.textContent = stages[0];
+  loadTimer = setInterval(() => { i = (i+1) % stages.length; const e2 = $("#loadStage"); if(e2) e2.textContent = stages[i]; }, 4200);
+}
+function stopLoadingAnim(){ if(loadTimer){ clearInterval(loadTimer); loadTimer = null; } }
+
+function showLoading(){
+  $("#content").innerHTML =
+    '<div class="loading"><div class="pulse"></div><div class="stage" id="loadStage">起動中…</div>'+
+    '<div class="sub">世界のニュース検索から解説執筆まで、少しお待ちください</div></div>';
+  startLoadingAnim();
+}
+
+async function generate(force){
+  const key = "mnd:lesson:" + todayStr() + ":" + settingsHash(settings) + (force ? ":" + Date.now().toString(36) : "");
+  // キャッシュ（force時は無視）
+  if(!force){
+    const cached = store.get(key);
+    if(cached){ try { render(JSON.parse(cached), true); return; } catch(e){} }
+  }
+  showLoading();
+  try{
+    const res = await fetch(CONFIG.PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildRequestBody(settings)),
+    });
+    if(!res.ok){
+      let detail = "";
+      try { detail = await res.text(); } catch(e){}
+      throw new Error(`プロキシ/APIがHTTP ${res.status} を返しました。\n${detail.slice(0,500)}`);
+    }
+    const data = await res.json();
+    const { obj } = extractJson(data);
+    if(!obj.date) obj.date = todayStr();
+    const storeKey = "mnd:lesson:" + todayStr() + ":" + settingsHash(settings);
+    store.set(storeKey, JSON.stringify(obj));
+    pushIndex(obj.date, storeKey, obj.headline_en || "(no title)");
+    stopLoadingAnim();
+    render(obj, false);
+    renderHistory();
+  }catch(err){
+    stopLoadingAnim();
+    renderError(err);
+  }
+}
+
+/* ---- 描画 ---- */
+function render(o, cached){
+  const exprs = Array.isArray(o.expressions) ? o.expressions : [];
+  const exprHtml = exprs.map(x => `
+    <article class="expr">
+      <span class="expr-type">${esc(x.type||"EXPRESSION")}</span><br/>
+      <h3 style="margin:0;"><span class="expr-en">${esc(x.en)}</span></h3>
+      ${x.reading_note ? `<div class="expr-reading">${esc(x.reading_note)}</div>` : ""}
+      <p class="expr-ja">${esc(x.ja)}</p>
+      ${x.nuance_ja ? `<p class="expr-nuance">${esc(x.nuance_ja)}</p>` : ""}
+      ${x.example_en ? `<div class="expr-ex"><p class="ex-en">${esc(x.example_en)}</p>${x.example_ja?`<p class="ex-ja">${esc(x.example_ja)}</p>`:""}</div>` : ""}
+    </article>`).join("");
+
+  $("#content").innerHTML = `
+    <div class="kicker">
+      ${cached ? '<span class="badge">本日分</span>' : '<span class="badge">NEW</span>'}
+      Today's Article
+    </div>
+    <h2 class="headline-en">${esc(o.headline_en)}</h2>
+    ${o.headline_ja ? `<p class="headline-ja">${esc(o.headline_ja)}</p>` : ""}
+    <div class="source-row">
+      <span>${esc(o.source_name||"")}</span>
+      ${o.source_url ? `<span>·</span><a href="${esc(o.source_url)}" target="_blank" rel="noopener">記事を読む ↗</a>` : ""}
+    </div>
+
+    ${o.facts_ja ? `<div class="section-label">今日の出来事</div><p class="prose">${esc(o.facts_ja)}</p>` : ""}
+    ${o.why_important_ja ? `<div class="why">${esc(o.why_important_ja)}</div>` : ""}
+
+    <div class="section-label">今日の表現</div>
+    ${exprHtml || '<p class="prose">表現が取得できませんでした。</p>'}
+
+    <div class="takeaway">
+      ${o.takeaway_ja ? `<div class="section-label">今日のひとこと</div><p class="prose">${esc(o.takeaway_ja)}</p>` : ""}
+      ${o.practice_en ? `<div class="practice"><p class="p-en">${esc(o.practice_en)}</p>${o.practice_ja?`<p class="p-ja">${esc(o.practice_ja)}</p>`:""}</div>` : ""}
+    </div>
+  `;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderError(err){
+  $("#content").innerHTML = `
+    <div class="notice err">
+      <h3>記事を取得できませんでした</h3>
+      <p>プロキシまたはAPI呼び出しでエラーが発生しました。以下を確認してください。</p>
+      <ul>
+        <li>プロキシがリクエストボディ（model / max_tokens / messages / <b>tools[web_search]</b> / system）を <b>そのまま</b> Anthropic に転送しているか</li>
+        <li>プロキシが APIキー と <code>anthropic-version</code> ヘッダを付与しているか</li>
+        <li>このページのオリジンに対して <b>CORS</b> を許可しているか</li>
+        <li>設定のモデル名（<code>${esc(CONFIG.MODEL)}</code>）があなたのアカウントで利用可能か</li>
+      </ul>
+      <details><summary>エラー詳細</summary><pre>${esc(err && err.message ? err.message : String(err))}</pre></details>
+      <button class="btn" id="retryBtn">もう一度試す</button>
+    </div>`;
+  const b = $("#retryBtn"); if(b) b.addEventListener("click", () => generate(true));
+}
+
+/* ---- 履歴描画 ---- */
+function renderHistory(){
+  const idx = loadIndex();
+  const list = $("#historyList");
+  if(!idx.length){ list.innerHTML = '<div class="hist-empty">まだ履歴はありません。</div>'; return; }
+  list.innerHTML = idx.map(x =>
+    `<div class="hist-item" data-key="${esc(x.key)}"><span class="h-date">${esc(prettyDate(x.date))}</span><span class="h-title">${esc(x.headline)}</span></div>`
+  ).join("");
+  list.querySelectorAll(".hist-item").forEach(el => {
+    el.addEventListener("click", () => {
+      const raw = store.get(el.dataset.key);
+      if(raw){ try { render(JSON.parse(raw), true); $("#historyPanel").classList.remove("open"); } catch(e){} }
+    });
+  });
+}
+
+/* ---- 設定パネルUI ---- */
+function paintChips(){
+  document.querySelectorAll(".chips").forEach(group => {
+    const g = group.dataset.group;
+    group.querySelectorAll(".chip").forEach(chip => {
+      const v = chip.dataset.val;
+      const on = g === "level" ? settings.level === v : settings[g].includes(v);
+      chip.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  });
+}
+function wireChips(){
+  document.querySelectorAll(".chips").forEach(group => {
+    const g = group.dataset.group;
+    const single = group.dataset.single === "1";
+    group.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const v = chip.dataset.val;
+        if(single){ settings.level = v; }
+        else {
+          const arr = settings[g];
+          const i = arr.indexOf(v);
+          if(i === -1) arr.push(v); else if(arr.length > 1) arr.splice(i,1);
+        }
+        paintChips();
+      });
+    });
+  });
+}
+
+/* ---- init ---- */
+function init(){
+  $("#dateLabel").textContent = prettyDate(todayStr());
+  wireChips();
+  paintChips();
+  renderHistory();
+
+  $("#btnSettings").addEventListener("click", () => {
+    $("#historyPanel").classList.remove("open");
+    $("#settingsPanel").classList.toggle("open");
+  });
+  $("#btnHistory").addEventListener("click", () => {
+    $("#settingsPanel").classList.remove("open");
+    $("#historyPanel").classList.toggle("open");
+  });
+  $("#btnRefresh").addEventListener("click", () => generate(true));
+  $("#applySettings").addEventListener("click", () => {
+    saveSettings(settings);
+    $("#settingsPanel").classList.remove("open");
+    generate(true);
+  });
+
+  generate(false);
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
