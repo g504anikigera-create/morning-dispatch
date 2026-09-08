@@ -1,0 +1,38 @@
+name: Backup daily generate (morning-dispatch)
+
+# Cloudflare Worker の cron（毎朝 21:30 UTC = 6:30 JST）が何らかの理由で
+# 動かなかったときの保険。10分後にその日の教材ができているか確認し、
+# できていなければ /generate を叩いて生成する。すでにできていれば何もしない
+# （＝Cloudflareのcronが正常に動いた日は、APIを二重で叩かない）。
+
+on:
+  schedule:
+    - cron: "40 21 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  check-and-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check today's lesson, generate only if missing
+        run: |
+          TODAY_JST=$(date -u -d "+9 hours" +%F)
+          echo "Expected JST date: $TODAY_JST"
+
+          CURRENT=$(curl -s "https://morning-dispatch.g504-aniki-gera.workers.dev/today")
+          CURRENT_DATE=$(echo "$CURRENT" | jq -r '.date // empty')
+          echo "Worker's current date: ${CURRENT_DATE:-(none)}"
+
+          if [ "$CURRENT_DATE" != "$TODAY_JST" ]; then
+            echo "Not updated yet. Triggering /generate ..."
+            HTTP_CODE=$(curl -s -o /tmp/gen_out.json -w "%{http_code}" \
+              "https://morning-dispatch.g504-aniki-gera.workers.dev/generate?key=${{ secrets.MORNING_TRIGGER_KEY }}")
+            echo "generate response: HTTP $HTTP_CODE"
+            cat /tmp/gen_out.json
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "::error::generate failed with HTTP $HTTP_CODE"
+              exit 1
+            fi
+          else
+            echo "Already up to date. Skipping (no extra API cost)."
+          fi
